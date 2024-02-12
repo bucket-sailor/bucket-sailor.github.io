@@ -1,0 +1,3 @@
+baseURL = 'http://www.bucket-sailor.com/'
+languageCode = 'en-us'
+title = 'Bucketeer Blog'

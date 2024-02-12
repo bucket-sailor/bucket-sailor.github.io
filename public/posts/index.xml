@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on </title>
+    <link>/posts/</link>
+    <description>Recent content in Posts on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Mon, 12 Feb 2024 12:35:44 +0100</lastBuildDate>
+    <atom:link href="/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>All You Need Is S3</title>
+      <link>/posts/all-you-need-is-s3/</link>
+      <pubDate>Mon, 12 Feb 2024 12:35:44 +0100</pubDate>
+      <guid>/posts/all-you-need-is-s3/</guid>
+      <description>By: Damian Peckett&#xA;Over the past decade, the tech industry has significantly invested in the development of the cloud-native ecosystem, pouring vast amounts of human capital into its expansion. Despite the apparent diversity, a common underlying challenge unifies most projects: achieving consistent data sharing between processes.&#xA;The term &amp;ldquo;data&amp;rdquo; encompasses a broad spectrum, from files and messages to database records and event streams. The current dominant paradigm has been to partition the task of sharing data into distinct domains, such as object storage, message queues, and databases.</description>
+    </item>
+    <item>
+      <title>Introducing Bucketeer</title>
+      <link>/posts/introducing-bucketeer/</link>
+      <pubDate>Fri, 09 Feb 2024 12:43:27 +0100</pubDate>
+      <guid>/posts/introducing-bucketeer/</guid>
+      <description>Tired of Your Vendors S3 Management UI? Or You Want Hassle Free Bucket Sharing? Bucketeer is Here to Help!&#xA;https://github.com/bucket-sailor/bucketeer</description>
+    </item>
+  </channel>
+</rss>

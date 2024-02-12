@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>All You Need Is S3 | </title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">All You Need Is S3</span></h1>
+
+<h2 class="date">2024/02/12</h2>
+</div>
+
+<main>
+<p>By: <a href="mailto:damian@pecke.tt">Damian Peckett</a></p>
+<p>Over the past decade, the tech industry has significantly invested in the development of the cloud-native ecosystem, pouring vast amounts of human capital into its expansion. Despite the apparent diversity, a common underlying challenge unifies most projects: achieving consistent data sharing between processes.</p>
+<p>The term &ldquo;data&rdquo; encompasses a broad spectrum, from files and messages to database records and event streams. The current dominant paradigm has been to partition the task of sharing data into distinct domains, such as object storage, message queues, and databases. These domain specific systems invariably feature a half baked implementation of Paxos <!-- raw HTML omitted -->[1][2]<!-- raw HTML omitted -->, a custom persistence layer, and bespoke APIs.</p>
+<p>However, at its core, data remains merely a sequence of bytes. Do we really need to slice it, dice it, and treat it so differently?</p>
+<p>Admittedly, each system is optimized for specific data types, employing various optimizations and transformations (e.g., indexing, compression, etc) before persistence. But when it comes time to flush the data to disk, the target is invariably a file sitting on a filesystem. So it&rsquo;s pretty clear that we all implicitly agree that when it comes to durabilitiy, POSIX filesystems are &ldquo;good&rdquo; enough <!-- raw HTML omitted -->[3]<!-- raw HTML omitted -->.</p>
+<p>Less well known by most developers is that POSIX included more than just regular files. It also included synchronization primitives such as file locks <!-- raw HTML omitted -->[4][5][6]<!-- raw HTML omitted -->. File locking allows multiple processes to synchronize shared access to a file. Wait a minute, remember the initial problem the cloud-native ecosystem set out to address? POSIX has provided a solution on single-node systems for decades, a solution that has become so integral it often goes unnoticed.</p>
+<p>But can the concept of files extend beyond a single machine? Various network filesystems have tried, often sacrificing consistency for performance <!-- raw HTML omitted -->[7]<!-- raw HTML omitted -->. Yet, CephFS&rsquo;s success and IBM Spectrum Scale (GPFS) indicate that sacrificing consistency isn&rsquo;t always necessary.</p>
+<p>The most interesting in this space is Google&rsquo;s Colossus<!-- raw HTML omitted -->[8]<!-- raw HTML omitted -->, the network filesystem at the heart of Google&rsquo;s cloud storage. It doesn&rsquo;t strictly adhere to POSIX; instead, it uses an in-process client library for filesystem communication, allowing applications to adjust consistency as needed.</p>
+<p>Interestingly, AWS initially lacked a globally consistent network filesystem, and instead promoted an eventually consistent object storage model. Designing a performant network filesystem is fiendishly difficult and if you just give up on the idea of strong consistency there&rsquo;s a lot of &ldquo;free&rdquo; performance to be had.</p>
+<p>But the problem is when your storage layer is eventually consistent, you have to build a lot of extra supporting infrastructure to make up for it. While eventually consistent object storage is cheap, the supporting infrastructure is not.</p>
+<p>My unconvential take is that what if we just used files on a network filesystem as the underlying cloud infrastructure abstraction? Seriously what&rsquo;s the difference between a file and a document in a key-value store? What if a message queue was just a directory of sorted files? A lot of the boring infrastructure we use today could be replaced with simple abstraction libraries.</p>
+<p>Admittedly there are some performance concerns but I think most of them can be addressed by adopting a flexible consistency model akin to that of Google&rsquo;s Colossus.</p>
+<p>I think the main reason that this hasn&rsquo;t happened already is that it took the cloud providers a long time to offer good network filesystem products, and by the time they had the ecosystem had already embraced the eventual consistency model. But I think it&rsquo;s overdue for us to re-evaluate the tradeoffs we&rsquo;ve made.</p>
+<p>Returning to S3, while originally it was an eventually consistent object store, it has evolved to adopt many filesystem-like semantics <!-- raw HTML omitted -->[9][10]<!-- raw HTML omitted -->, and in recent years has even offered strong read-after-write consistency <!-- raw HTML omitted -->[11]<!-- raw HTML omitted -->. The way I look at it is that such a network filesystem product already exists, it&rsquo;s just not POSIX. It&rsquo;s S3.</p>
+<p>Forgive me for the advertisement but after growing frustrated with clunky vendor S3 UIs and how difficult it is to share buckets with non-technical users I&rsquo;ve developed <a href="https://github.com/bucket-sailor/bucketeer">Bucketeer</a> which I&rsquo;m hoping to grow into the &ldquo;Ultimate S3 Bucket Explorer&rdquo;. I highly recommend you check it out!</p>
+<h2 id="references">References</h2>
+<ol>
+<li>L. Lamport, &ldquo;Paxos Made Simple,&rdquo; ACM SIGACT News (Distributed Computing Column) 32, no. 4 (Whole Number 121, December 2001), pp. 51-58, December 2001. Available: <a href="https://www.microsoft.com/en-us/research/publication/paxos-made-simple/">https://www.microsoft.com/en-us/research/publication/paxos-made-simple/</a>.</li>
+<li>Jepsen, &ldquo;Analyses,&rdquo; Jepsen.io, 2023. Available: <a href="https://jepsen.io/analyses">https://jepsen.io/analyses</a>.</li>
+<li>A. Aghayev, S. Weil, M. Kuchnik, M. Nelson, G. R. Ganger, and G. Amvrosiadis, &ldquo;File systems unfit as distributed storage backends: lessons from 10 years of Ceph evolution,&rdquo; in Proceedings of the 27th ACM Symposium on Operating Systems Principles (SOSP &lsquo;19), Huntsville, Ontario, Canada, 2019, pp. 353-369. Available: <a href="https://dl.acm.org/doi/abs/10.1145/3341301.3359656">https://dl.acm.org/doi/abs/10.1145/3341301.3359656</a>. doi: 10.1145/3341301.3359656.</li>
+<li>L. Poettering, &ldquo;On the Brokenness of File Locking,&rdquo; 0pointer.de, June 26, 2010. Available: <a href="https://0pointer.de/blog/projects/locking.html">https://0pointer.de/blog/projects/locking.html</a>.</li>
+<li>J. T. Layton, &ldquo;File-private POSIX locks,&rdquo; LWN.net, February 19, 2014. Available: <a href="https://lwn.net/Articles/586904/">https://lwn.net/Articles/586904/</a>.</li>
+<li>&ldquo;The GNU C Library Manual,&rdquo; section &ldquo;Open File Description Locks,&rdquo; Free Software Foundation. Available: <a href="https://www.gnu.org/software/libc/manual/html_mono/libc.html#Open-File-Description-Locks">https://www.gnu.org/software/libc/manual/html_mono/libc.html#Open-File-Description-Locks</a>.</li>
+<li>O. Kirch. Why NFS Sucks. Proceedings of the
+2006 Ottawa Linux Symposium, Ottawa, Canada,
+July, 2006. Available: <a href="https://www.kernel.org/doc/ols/2006/ols2006v2-pages-59-72.pdf">https://www.kernel.org/doc/ols/2006/ols2006v2-pages-59-72.pdf</a>.</li>
+<li>&ldquo;Colossus under the hood: a peek into Google’s scalable storage system,&rdquo; Google Cloud Blog, 20 April 2021. Available: <a href="https://cloud.google.com/blog/products/storage-data-transfer/a-peek-behind-colossus-googles-file-system">https://cloud.google.com/blog/products/storage-data-transfer/a-peek-behind-colossus-googles-file-system</a>.</li>
+<li>&ldquo;ListObjectsV2 - Amazon Simple Storage Service,&rdquo; Amazon Web Services, Inc., 2023. Available: <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectsV2.html">https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectsV2.html</a>.</li>
+<li>&ldquo;Uploading and copying objects using multipart upload - Amazon Simple Storage Service,&rdquo; Amazon Web Services, Inc., 2023.  Available: <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html">https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html</a>.</li>
+<li>J. Barr, &ldquo;Amazon S3 Update – Strong Read-After-Write Consistency,&rdquo; AWS News Blog, 01-Dec-2020. Available: <a href="https://aws.amazon.com/blogs/aws/amazon-s3-update-strong-read-after-write-consistency/">https://aws.amazon.com/blogs/aws/amazon-s3-update-strong-read-after-write-consistency/</a>.</li>
+</ol>
+
+</main>
+
+  <footer>
+  
+  
+  </footer>
+  </body>
+</html>
+

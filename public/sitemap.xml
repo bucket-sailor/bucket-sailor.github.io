@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>/</loc>
+    <lastmod>2024-02-12T12:35:44+01:00</lastmod>
+  </url><url>
+    <loc>/posts/all-you-need-is-s3/</loc>
+    <lastmod>2024-02-12T12:35:44+01:00</lastmod>
+  </url><url>
+    <loc>/posts/</loc>
+    <lastmod>2024-02-12T12:35:44+01:00</lastmod>
+  </url><url>
+    <loc>/imprint/</loc>
+    <lastmod>2024-02-09T12:43:27+01:00</lastmod>
+  </url><url>
+    <loc>/posts/introducing-bucketeer/</loc>
+    <lastmod>2024-02-09T12:43:27+01:00</lastmod>
+  </url><url>
+    <loc>/categories/</loc>
+  </url><url>
+    <loc>/tags/</loc>
+  </url>
+</urlset>
